@@ -45,6 +45,6 @@ arabic-reshaper
 pyhyphen
 langcodes
 manga-ocr
-pillow_avif
+pillow-avif-plugin
 hashlib
 oscrypto
