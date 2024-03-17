@@ -13,6 +13,10 @@ from PIL import Image
 from aiohttp import web
 from collections import deque
 from imagehash import phash
+from oscrypto import util as crypto_utils
+import hashlib
+import aiofiles
+import pillow_avif
 
 SERVER_DIR_PATH = os.path.dirname(os.path.realpath(__file__))
 BASE_PATH = os.path.dirname(os.path.dirname(SERVER_DIR_PATH))
@@ -181,12 +185,20 @@ async def handle_post(request):
         content = file_field.file.read()
     elif 'url' in data:
         from aiohttp import ClientSession
-        async with ClientSession() as session:
-            async with session.get(data['url']) as resp:
-                if resp.status == 200:
-                    content = await resp.read()
-                else:
-                    return web.json_response({'status': 'error'})
+        filename = hashlib.md5(data['url'].encode()).hexdigest()
+        if os.path.exists(filename):
+            # If the file exists, read the image from the file
+            async with aiofiles.open('cache/' + filename, 'rb') as f:
+                content = await f.read()
+        else:
+            async with ClientSession() as session:
+                async with session.get(data['url']) as resp:
+                    if resp.status == 200:
+                        content = await resp.read()
+                        async with aiofiles.open('cache/' + filename, 'wb') as f:
+                            await f.write(content)
+                    else:
+                        return web.json_response({'status': 'error'})
     else:
         return web.json_response({'status': 'error'})
     try:
