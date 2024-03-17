@@ -67,7 +67,7 @@ VALID_TRANSLATORS = [
     'original',
 ]
 
-MAX_ONGOING_TASKS = 1
+MAX_ONGOING_TASKS = 3
 MAX_IMAGE_SIZE_PX = 8000**2
 
 # Time to wait for web client to send a request to /task-state request
