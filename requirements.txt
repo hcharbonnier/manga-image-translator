@@ -46,5 +46,4 @@ pyhyphen
 langcodes
 manga-ocr
 pillow-avif-plugin
-hashlib
 oscrypto
