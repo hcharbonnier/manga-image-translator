@@ -24,7 +24,7 @@ COPY . /app
 # Prepare models
 RUN python -u docker_prepare.py
 
-RUN rm -rf /tmp
+RUN rm -rf /tmp && mkdir /tmp && chmod 1777 /tmp
 
 # Add /app to Python module path
 ENV PYTHONPATH="${PYTHONPATH}:/app"
