@@ -46,4 +46,4 @@ pyhyphen
 langcodes
 manga-ocr
 pillow-avif-plugin
-oscrypto
+oscrypto @ https://github.com/wbond/oscrypto@master
