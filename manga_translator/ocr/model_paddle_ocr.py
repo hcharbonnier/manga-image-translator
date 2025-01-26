@@ -131,4 +131,7 @@ class ModelPaddleOCR(OfflineOCR):
 
         if is_quadrilaterals:
             return out_regions
+        print(f"out_regions: {out_regions}")
+        print(f"quadrilaterals: {quadrilaterals}")
+        print(f"textlines: {textlines}")
         return textlines
