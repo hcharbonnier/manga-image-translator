@@ -20,71 +20,6 @@ from ..textline_merge import split_text_region
 from ..utils import TextBlock, Quadrilateral, quadrilateral_can_merge_region, chunks
 from ..utils.generic import AvgMeter
 
-async def merge_bboxes(bboxes: List[Quadrilateral], width: int, height: int) -> Tuple[List[Quadrilateral], int]:
-    # step 1: divide into multiple text region candidates
-    G = nx.Graph()
-    for i, box in enumerate(bboxes):
-        G.add_node(i, box=box)
-    for ((u, ubox), (v, vbox)) in itertools.combinations(enumerate(bboxes), 2):
-        # if quadrilateral_can_merge_region_coarse(ubox, vbox):
-        if quadrilateral_can_merge_region(ubox, vbox, aspect_ratio_tol=1.3, font_size_ratio_tol=2,
-                                          char_gap_tolerance=1, char_gap_tolerance2=3):
-            G.add_edge(u, v)
-
-    # step 2: postprocess - further split each region
-    region_indices: List[Set[int]] = []
-    for node_set in nx.algorithms.components.connected_components(G):
-         region_indices.extend(split_text_region(bboxes, node_set, width, height))
-
-    # step 3: return regions
-    merge_box = []
-    merge_idx = []
-    for node_set in region_indices:
-    # for node_set in nx.algorithms.components.connected_components(G):
-        nodes = list(node_set)
-        txtlns: List[Quadrilateral] = np.array(bboxes)[nodes]
-
-        # majority vote for direction
-        dirs = [box.direction for box in txtlns]
-        majority_dir_top_2 = Counter(dirs).most_common(2)
-        if len(majority_dir_top_2) == 1 :
-            majority_dir = majority_dir_top_2[0][0]
-        elif majority_dir_top_2[0][1] == majority_dir_top_2[1][1] : # if top 2 have the same counts
-            max_aspect_ratio = -100
-            for box in txtlns :
-                if box.aspect_ratio > max_aspect_ratio :
-                    max_aspect_ratio = box.aspect_ratio
-                    majority_dir = box.direction
-                if 1.0 / box.aspect_ratio > max_aspect_ratio :
-                    max_aspect_ratio = 1.0 / box.aspect_ratio
-                    majority_dir = box.direction
-        else :
-            majority_dir = majority_dir_top_2[0][0]
-
-        # sort textlines
-        if majority_dir == 'h':
-            nodes = sorted(nodes, key=lambda x: bboxes[x].centroid[1])
-        elif majority_dir == 'v':
-            nodes = sorted(nodes, key=lambda x: -bboxes[x].centroid[0])
-        txtlns = np.array(bboxes)[nodes]
-        # yield overall bbox and sorted indices
-        merge_box.append(txtlns)
-        merge_idx.append(nodes)
-    
-    return_box = []
-    for bbox in merge_box:
-        if len(bbox) == 1:
-            return_box.append(bbox[0])
-        else:
-            prob = [q.prob for q in bbox]
-            prob = sum(prob)/len(prob)
-            base_box = bbox[0]
-            for box in bbox[1:]:
-                min_rect = np.array(Polygon([*base_box.pts, *box.pts]).minimum_rotated_rectangle.exterior.coords[:4])
-                base_box = Quadrilateral(min_rect, '', prob)
-            return_box.append(base_box)
-    return return_box, merge_idx
-
 class ModelTesseractOCR(OfflineOCR):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -111,12 +46,8 @@ class ModelTesseractOCR(OfflineOCR):
             is_quadrilaterals = True
         
         texts = {}
-        if config.use_mocr_merge:
-            merged_textlines, merged_idx = await merge_bboxes(textlines, image.shape[1], image.shape[0])
-            merged_quadrilaterals = list(self._generate_text_direction(merged_textlines))
-        else:
-            merged_idx = [[i] for i in range(len(region_imgs))]
-            merged_quadrilaterals = quadrilaterals
+        merged_idx = [[i] for i in range(len(region_imgs))]
+        merged_quadrilaterals = quadrilaterals
         merged_region_imgs = []
         for q, d in merged_quadrilaterals:
             if d == 'h':
@@ -155,7 +86,6 @@ class ModelTesseractOCR(OfflineOCR):
                     else:
                         cv2.imwrite(f'result/ocrs/{ix}.png', cv2.cvtColor(region[i, :, :, :], cv2.COLOR_RGB2BGR))
                 ix += 1
-            # Populate out_regions with OCR results
             for i in range(N):
                 cur_region = quadrilaterals[indices[i]][0]
                 cur_region.text = texts[indices[i]]
