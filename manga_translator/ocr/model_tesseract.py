@@ -13,6 +13,7 @@ from shapely.geometry import Polygon
 import torch
 
 import pytesseract
+import shutil
 
 from .common import OfflineOCR
 from ..config import OcrConfig
@@ -24,6 +25,13 @@ class ModelTesseractOCR(OfflineOCR):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.logger = kwargs.get('logger', None)  # Ensure logger is defined
+        self._check_tesseract()
+
+    def _check_tesseract(self):
+        if not shutil.which("tesseract"):
+            if self.logger:
+                self.logger.error("Tesseract is not installed or not found in PATH.")
+            raise EnvironmentError("Tesseract is not installed or not found in PATH.")
 
     async def _load(self, device: str):
         self.device = device
