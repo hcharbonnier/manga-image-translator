@@ -26,7 +26,7 @@ class ModelPaddleOCR(OfflineOCR):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.logger = kwargs.get('logger', None)  # Ensure logger is defined
-        self.ocr = PaddleOCR(use_angle_cls=True, lang='en')  # Initialize PaddleOCR
+        self.ocr = PaddleOCR(use_angle_cls=False, lang='en')  # Initialize PaddleOCR
         self.lang_map = {
             'en': 'en',
             'es': 'french',  # PaddleOCR does not support Spanish directly
@@ -91,6 +91,9 @@ class ModelPaddleOCR(OfflineOCR):
                 if self.logger:
                     self.logger.info(f"Detected language: {detected_lang}")
                     self.logger.info(f"OCR result: {result}")  # Log the OCR result
+                for line in result:
+                    print(line)
+
                 texts[idx] = " ".join([line[1][0] for line in result])
             except Exception as e:
                 if self.logger:
