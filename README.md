@@ -574,7 +574,8 @@ an example can be found in example/config-example.json
         "32px",
         "48px",
         "48px_ctc",
-        "mocr"
+        "mocr",
+        "tesseract"
       ],
       "title": "Ocr",
       "type": "string"
