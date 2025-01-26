@@ -98,9 +98,11 @@ class ModelPaddleOCR(OfflineOCR):
                     if self.logger:
                         self.logger.info(f"Detected language: {detected_lang}")
                         self.logger.info(f"OCR result: {result}")  # Log the OCR result
+                    if not result or not isinstance(result, list):
+                        raise ValueError("Invalid OCR result format")
                     for line in result:
                         print(f"OCR line: {line}")
-                    txt = " ".join([line[1][0] for line in result])
+                    txt = " ".join([line[1][0] for line in result if line and isinstance(line, list) and len(line) > 1])
                     prob = 1.0  # Set a default probability
                 except Exception as e:
                     if self.logger:
@@ -118,9 +120,12 @@ class ModelPaddleOCR(OfflineOCR):
                     cur_region.bg_r = 255
                     cur_region.bg_g = 255
                     cur_region.bg_b = 255
-                else:
+                elif hasattr(cur_region, 'text'):
                     cur_region.text.append(txt)
                     cur_region.update_font_colors(np.array([0, 0, 0]), np.array([255, 255, 255]))
+                else:
+                    if self.logger:
+                        self.logger.error(f"cur_region does not have a 'text' attribute")
 
                 out_regions.append(cur_region)
 
