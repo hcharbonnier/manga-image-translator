@@ -55,4 +55,5 @@ fastapi
 pydantic
 python-multipart
 paddleocr
+paddleclas
 paddlepaddle-gpu==2.5.2
