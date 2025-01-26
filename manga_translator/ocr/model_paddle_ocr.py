@@ -98,6 +98,8 @@ class ModelPaddleOCR(OfflineOCR):
                     if self.logger:
                         self.logger.info(f"Detected language: {detected_lang}")
                         self.logger.info(f"OCR result: {result}")  # Log the OCR result
+                    for line in result:
+                        print(f"OCR line: {line}")
                     txt = " ".join([line[1][0] for line in result])
                     prob = 1.0  # Set a default probability
                 except Exception as e:
