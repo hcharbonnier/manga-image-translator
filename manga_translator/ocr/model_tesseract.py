@@ -67,8 +67,8 @@ class ModelTesseractOCR(OfflineOCR):
             merged_region_imgs.append(q.get_transformed_region(image, merged_d, merged_text_height))
         for idx in range(len(merged_region_imgs)):
             try:
-                # Use pytesseract for OCR
-                texts[idx] = pytesseract.image_to_string(Image.fromarray(merged_region_imgs[idx]), lang='eng')
+                # Use pytesseract for OCR with automatic language detection
+                texts[idx] = pytesseract.image_to_string(Image.fromarray(merged_region_imgs[idx]), lang='osd')
             except Exception as e:
                 if self.logger:
                     self.logger.error(f"Error during OCR: {e}")
