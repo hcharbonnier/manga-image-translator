@@ -14,6 +14,7 @@ import torch
 
 import pytesseract
 import shutil
+from langdetect import detect
 
 from .common import OfflineOCR
 from ..config import OcrConfig
@@ -26,6 +27,29 @@ class ModelTesseractOCR(OfflineOCR):
         super().__init__(*args, **kwargs)
         self.logger = kwargs.get('logger', None)  # Ensure logger is defined
         self._check_tesseract()
+        self.lang_map = {
+            'en': 'eng',
+            'es': 'spa',
+            'fr': 'fra',
+            'de': 'deu',
+            'it': 'ita',
+            'pt': 'por',
+            'ru': 'rus',
+            'ja': 'jpn',
+            'ko': 'kor',
+            'zh-cn': 'chi_sim',  # Simplified Chinese
+            'zh-tw': 'chi_tra',  # Traditional Chinese
+            'ar': 'ara',
+            'hi': 'hin',
+            'bn': 'ben',
+            'pa': 'pan',
+            'jv': 'jav',
+            'ms': 'msa',
+            'id': 'ind',
+            'vi': 'vie',
+            'th': 'tha',
+            # Add other mappings as needed
+        }
 
     def _check_tesseract(self):
         if not shutil.which("tesseract"):
@@ -67,8 +91,12 @@ class ModelTesseractOCR(OfflineOCR):
             merged_region_imgs.append(q.get_transformed_region(image, merged_d, merged_text_height))
         for idx in range(len(merged_region_imgs)):
             try:
-                # Use pytesseract for OCR with automatic language detection
-                texts[idx] = pytesseract.image_to_string(Image.fromarray(merged_region_imgs[idx]), lang='osd')
+                # Detect language using langdetect
+                detected_lang = detect(pytesseract.image_to_string(Image.fromarray(merged_region_imgs[idx]), lang='osd'))
+                # Map detected language to Tesseract language code
+                tesseract_lang = self.lang_map.get(detected_lang, 'eng')  # Default to 'eng' if not found
+                # Use pytesseract for OCR with detected language
+                texts[idx] = pytesseract.image_to_string(Image.fromarray(merged_region_imgs[idx]), lang=tesseract_lang)
             except Exception as e:
                 if self.logger:
                     self.logger.error(f"Error during OCR: {e}")
