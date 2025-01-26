@@ -93,8 +93,10 @@ class ModelTesseractOCR(OfflineOCR):
             try:
                 # Detect language using langdetect
                 detected_lang = detect(pytesseract.image_to_string(Image.fromarray(merged_region_imgs[idx]), lang='osd'))
+                if self.logger:
+                    self.logger.info(f"Detected language: {detected_lang}")
                 # Map detected language to Tesseract language code
-                tesseract_lang = self.lang_map.get(detected_lang, 'eng')  # Default to 'eng' if not found
+                tesseract_lang = self.lanSg_map.get(detected_lang, 'eng')  # Default to 'eng' if not found
                 # Use pytesseract for OCR with detected language
                 texts[idx] = pytesseract.image_to_string(Image.fromarray(merged_region_imgs[idx]), lang=tesseract_lang)
             except Exception as e:
