@@ -90,13 +90,11 @@ class ModelTesseractOCR(OfflineOCR):
                 cur_region = quadrilaterals[indices[i]][0]
                 cur_region.text = texts[indices[i]]
                 cur_region.prob = 1.0  # Set a default probability
-                cur_region.area = cur_region.aabb.area()  # Ensure area is set
                 out_regions[idx_keys[i]] = cur_region
                 
         output_regions = []
         for i, nodes in enumerate(merged_idx):
             total_logprobs = 0
-            total_area = 0
             fg_r = []
             fg_g = []
             fg_b = []
@@ -108,8 +106,7 @@ class ModelTesseractOCR(OfflineOCR):
                 if idx not in out_regions:
                     continue
                     
-                total_logprobs += np.log(out_regions[idx].prob) * out_regions[idx].area
-                total_area += out_regions[idx].area
+                total_logprobs += np.log(out_regions[idx].prob)
                 fg_r.append(out_regions[idx].fg_r)
                 fg_g.append(out_regions[idx].fg_g)
                 fg_b.append(out_regions[idx].fg_b)
@@ -117,8 +114,7 @@ class ModelTesseractOCR(OfflineOCR):
                 bg_g.append(out_regions[idx].bg_g)
                 bg_b.append(out_regions[idx].bg_b)
                 
-            total_logprobs /= total_area
-            prob = np.exp(total_logprobs)
+            prob = np.exp(total_logprobs / len(nodes))
             fr = round(np.mean(fg_r))
             fg = round(np.mean(fg_g))
             fb = round(np.mean(fg_b))
