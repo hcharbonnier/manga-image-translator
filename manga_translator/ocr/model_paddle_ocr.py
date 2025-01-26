@@ -90,6 +90,7 @@ class ModelPaddleOCR(OfflineOCR):
                 detected_lang = 'en'  # PaddleOCR does not support language detection
                 if self.logger:
                     self.logger.info(f"Detected language: {detected_lang}")
+                    self.logger.info(f"OCR result: {result}")  # Log the OCR result
                 texts[idx] = " ".join([line[1][0] for line in result])
             except Exception as e:
                 if self.logger:
