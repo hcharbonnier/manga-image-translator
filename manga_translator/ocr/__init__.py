@@ -17,7 +17,7 @@ OCRS = {
     Ocr.ocr48px_ctc: Model48pxCTCOCR,
     Ocr.mocr: ModelMangaOCR,
     Ocr.tesseract: ModelTesseractOCR,
-    Ocr.paddle: ModelPaddleOCR,
+    Ocr.paddleocr: ModelPaddleOCR,
 }
 ocr_cache = {}
 

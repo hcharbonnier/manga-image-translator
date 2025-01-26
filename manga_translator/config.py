@@ -108,6 +108,7 @@ class Ocr(str, Enum):
     ocr48px_ctc = "48px_ctc"
     mocr = "mocr"
     tesseract = "tesseract"
+    paddleocr = "paddleocr"
 
 class Translator(str, Enum):
     youdao = "youdao"
