@@ -73,7 +73,7 @@ class ModelPaddleOCR(OfflineOCR):
                 lang_result = next(self.lang_classifier.predict(input_data=merged_region_imgs[idx]))
                 detected_lang = lang_result['class_name']
                 # Use PaddleOCR for OCR with detected language
-                result = self.ocr.ocr(merged_region_imgs[idx], cls=True, lang=detected_lang)
+                result = self.ocr.ocr(merged_region_imgs[idx], cls=True, lang="en")
                 if self.logger:
                     self.logger.info(f"Detected language: {detected_lang}")
                     self.logger.info(f"OCR result: {result}")  # Log the OCR result
