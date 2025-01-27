@@ -147,6 +147,8 @@ class ModelPaddleOCR(OfflineOCR):
             txt = texts[nodes[0]]  # Ensure correct indexing
             if self.logger:
                 self.logger.info(f'prob: {prob} {txt} fg: ({fr}, {fg}, {fb}) bg: ({br}, {bg}, {bb})')
+                
+            print(f'prob: {prob} {txt} fg: ({fr}, {fg}, {fb}) bg: ({br}, {bg}, {bb})')
             cur_region = merged_quadrilaterals[i][0]
             if isinstance(cur_region, Quadrilateral):
                 cur_region.text = txt
