@@ -76,7 +76,7 @@ class ModelPaddleOCR(OfflineOCR):
                 if not result or not isinstance(result, list):
                     raise ValueError("Invalid OCR result format")
                 # Extract and concatenate the recognized text
-                texts[idx] = " ".join([line[1][0] for line in result[0] if line and isinstance(line, list) and len(line) > 1])
+                texts[idx] = " ".join([line[1][0] for line in result if line and isinstance(line, list) and len(line) > 1])
                 print(f"Text: {texts[idx]}")
             except Exception as e:
                 if self.logger:
@@ -110,10 +110,7 @@ class ModelPaddleOCR(OfflineOCR):
                 out_regions[idx_keys[i]] = cur_region
 
         output_regions = []
-
         for i, nodes in enumerate(merged_idx):
-            print(f"Nodes: {nodes}")
-            print(f"i: {i}")
             total_logprobs = 0
             fg_r = []
             fg_g = []
@@ -123,8 +120,6 @@ class ModelPaddleOCR(OfflineOCR):
             bg_b = []
 
             for idx in nodes:
-                print(f"idx: {idx}")
-                print(f"out_regions: {out_regions}")
                 if idx not in out_regions:
                     continue
 
@@ -147,7 +142,6 @@ class ModelPaddleOCR(OfflineOCR):
             txt = texts[nodes[0]]  # Ensure correct indexing
             if self.logger:
                 self.logger.info(f'prob: {prob} {txt} fg: ({fr}, {fg}, {fb}) bg: ({br}, {bg}, {bb})')
-                
             print(f'prob: {prob} {txt} fg: ({fr}, {fg}, {fb}) bg: ({br}, {bg}, {bb})')
             cur_region = merged_quadrilaterals[i][0]
             if isinstance(cur_region, Quadrilateral):
