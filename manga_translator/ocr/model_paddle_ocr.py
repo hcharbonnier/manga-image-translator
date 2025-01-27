@@ -48,6 +48,7 @@ class ModelPaddleOCR(OfflineOCR):
 
     async def _infer(self, image: np.ndarray, textlines: List[Quadrilateral], config: OcrConfig, verbose: bool = False, ignore_bubble: int = 0) -> List[TextBlock]:
         results = []
+        text_height = getattr(config, 'text_height', 48)  # Use default text height if not specified
         
         # Generate Text Direction
         for textline in textlines:
@@ -64,7 +65,7 @@ class ModelPaddleOCR(OfflineOCR):
         for textline in textlines:
             transformed_region = textline  # Placeholder for actual transformation logic
             # Transform each text region to a standard size
-            transformed_region = textline.get_transformed_region(image, direction, config.text_height)
+            transformed_region = textline.get_transformed_region(image, direction, text_height)
             transformed_regions.append(transformed_region)
             # ...existing code...
 
