@@ -64,7 +64,7 @@ class ModelPaddleOCR(OfflineOCR):
         for textline in textlines:
             transformed_region = textline  # Placeholder for actual transformation logic
             # Transform each text region to a standard size
-            transformed_region = textline.get_transformed_region(image, direction)
+            transformed_region = textline.get_transformed_region(image, direction, config.text_height)
             transformed_regions.append(transformed_region)
             # ...existing code...
 
