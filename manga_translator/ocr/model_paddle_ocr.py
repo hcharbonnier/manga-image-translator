@@ -82,6 +82,9 @@ class ModelPaddleOCR(OfflineOCR):
                 # Use PaddleOCR for OCR
                 result = self.ocr.ocr(merged_region_imgs[idx], cls=True)
                 print(f"OCR result for region {idx}: {result}")
+                # Ensure the result is in the expected format
+                if not result or not isinstance(result, list) or not isinstance(result[0], list):
+                    raise ValueError("Invalid OCR result format")
                 # Use PaddleClas for language detection
                 lang_result = next(self.lang_classifier.predict(input_data=merged_region_imgs[idx]))
                 detected_lang = lang_result['class_name']
@@ -89,8 +92,6 @@ class ModelPaddleOCR(OfflineOCR):
                 if self.logger:
                     self.logger.info(f"Detected language: {detected_lang}")
                     self.logger.info(f"OCR result: {result}")  # Log the OCR result
-                if not result or not isinstance(result, list):
-                    raise ValueError("Invalid OCR result format")
                 # Extract and concatenate the recognized text
                 texts[idx] = " ".join([line[1][0] for line in result[0] if line and isinstance(line, list) and len(line) > 1])
                 print(f"Recognized text for region {idx}: {texts[idx]}")
