@@ -88,6 +88,7 @@ class ModelPaddleOCR(OfflineOCR):
 
         ix = 0
         out_regions = {}
+        print(f"Texts: {texts}")
         for indices in chunks(perm, max_chunk_size):
             N = len(indices)
             widths = [region_imgs[i].shape[1] for i in indices]
