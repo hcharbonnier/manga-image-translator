@@ -76,6 +76,8 @@ class ModelPaddleOCR(OfflineOCR):
                     raise ValueError("Invalid OCR result format")
                 for line in result:
                     print(f"OCR line: {line}")
+                    print(f"Detected language: {detected_lang}")
+
                 texts[idx] = " ".join([line[1][0] for line in result if line and isinstance(line, list) and len(line) > 1])
             except Exception as e:
                 if self.logger:
