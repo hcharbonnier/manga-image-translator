@@ -27,8 +27,6 @@ class ModelPaddleOCR(OfflineOCR):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.logger = kwargs.get('logger', None)  # Ensure logger is defined
-        self.model_file = kwargs.get('model_file', None)  # Add model_file attribute
-        self.dict_file = kwargs.get('dict_file', None)  # Add dict_file attribute
         self.ocr = PaddleOCR(use_angle_cls=False, lang='en')  # Initialize PaddleOCR
         self.lang_classifier = PaddleClas(model_name="language_classification")  # Initialize PaddleClas
 
@@ -37,13 +35,10 @@ class ModelPaddleOCR(OfflineOCR):
         self.use_gpu = device in ['cuda', 'mps']
         
         # Load the OCR model and its dictionary
-        self.ocr = PaddleOCR(use_angle_cls=False, lang='en', det_model_dir=self.model_file, rec_model_dir=self.model_file, rec_char_dict_path=self.dict_file)
-        self.ocr.model.eval()
-        print("OCR model loaded and set to evaluation mode.")
+        self.ocr = PaddleOCR(use_angle_cls=False, lang='en')
         
         # Load the language classifier
         self.lang_classifier = PaddleClas(model_name="language_classification")
-        self.lang_classifier.model.eval()
         print("Language classifier loaded and set to evaluation mode.")
 
     async def _unload(self):
