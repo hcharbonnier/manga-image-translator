@@ -85,7 +85,6 @@ class ModelPaddleOCR(OfflineOCR):
 
         ix = 0
         out_regions = {}
-        print(f"Texts: {texts}")
         for indices in chunks(perm, max_chunk_size):
             N = len(indices)
             widths = [region_imgs[i].shape[1] for i in indices]
@@ -111,7 +110,10 @@ class ModelPaddleOCR(OfflineOCR):
                 out_regions[idx_keys[i]] = cur_region
 
         output_regions = []
+
         for i, nodes in enumerate(merged_idx):
+            print(f"Nodes: {nodes}")
+            print(f"i: {i}")
             total_logprobs = 0
             fg_r = []
             fg_g = []
