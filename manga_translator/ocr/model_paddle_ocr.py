@@ -57,14 +57,12 @@ class ModelPaddleOCR(OfflineOCR):
         print(f"Generated text directions: {quadrilaterals}")
         
         region_imgs = [q.get_transformed_region(image, d, text_height) for q, d in quadrilaterals]
-        print(f"Transformed text regions: {region_imgs}")
 
         perm = range(len(region_imgs))
         is_quadrilaterals = False
         if len(quadrilaterals) > 0 and isinstance(quadrilaterals[0][0], Quadrilateral):
             perm = sorted(range(len(region_imgs)), key=lambda x: region_imgs[x].shape[1])
             is_quadrilaterals = True
-        print(f"Permutation of regions: {perm}")
 
         texts = {}
         merged_idx = [[i] for i in range(len(region_imgs))]
@@ -100,6 +98,8 @@ class ModelPaddleOCR(OfflineOCR):
                 print(f"Recognized text for region {idx}: {texts[idx]}")
             except Exception as e:
                 print(f"Error during OCR for region {idx}: {e}")
+                print(f"Region merged_region_imgs[idx]: {merged_region_imgs[idx]}")
+                print(f"line: {line}")
                 if self.logger:
                     self.logger.error(f"Error during OCR: {e}")
                 texts[idx] = ""
