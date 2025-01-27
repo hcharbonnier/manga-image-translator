@@ -63,14 +63,8 @@ class ModelPaddleOCR(OfflineOCR):
             transformed_regions.append(transformed_region)
             # ...existing code...
 
-        # Merge Bounding Boxes (if enabled)
-        if config.merge_boxes:
-            merged_regions = split_text_region(transformed_regions)
-        else:
-            merged_regions = transformed_regions
-
         # Recognize Text
-        for region in merged_regions:
+        for region in transformed_regions:
             # Use PaddleClas to detect language
             lang_result = self.lang_classifier.predict(region)
             detected_lang = lang_result[0]['label']
