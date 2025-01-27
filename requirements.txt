@@ -56,4 +56,5 @@ pydantic
 python-multipart
 pytesseract
 paddleocr
-paddlepaddle  # Add this line
+paddlepaddle
+paddleclas
