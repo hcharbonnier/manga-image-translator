@@ -21,35 +21,14 @@ from ..utils import TextBlock, Quadrilateral, quadrilateral_can_merge_region, ch
 from ..utils.generic import AvgMeter
 
 from paddleocr import PaddleOCR
+from paddleclas import PaddleClas
 
 class ModelPaddleOCR(OfflineOCR):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.logger = kwargs.get('logger', None)  # Ensure logger is defined
         self.ocr = PaddleOCR(use_angle_cls=False, lang='en')  # Initialize PaddleOCR
-        self.lang_map = {
-            'en': 'en',
-            'es': 'french',  # PaddleOCR does not support Spanish directly
-            'fr': 'french',
-            'de': 'german',
-            'it': 'italian',  # PaddleOCR does not support Italian directly
-            'pt': 'portuguese',  # PaddleOCR does not support Portuguese directly
-            'ru': 'russian',  # PaddleOCR does not support Russian directly
-            'ja': 'japan',
-            'ko': 'korean',
-            'zh-cn': 'ch',  # Simplified Chinese
-            'zh-tw': 'ch',  # Traditional Chinese
-            'ar': 'arabic',  # PaddleOCR does not support Arabic directly
-            'hi': 'hindi',  # PaddleOCR does not support Hindi directly
-            'bn': 'bengali',  # PaddleOCR does not support Bengali directly
-            'pa': 'punjabi',  # PaddleOCR does not support Punjabi directly
-            'jv': 'javanese',  # PaddleOCR does not support Javanese directly
-            'ms': 'malay',  # PaddleOCR does not support Malay directly
-            'id': 'indonesian',  # PaddleOCR does not support Indonesian directly
-            'vi': 'vietnamese',  # PaddleOCR does not support Vietnamese directly
-            'th': 'thai',  # PaddleOCR does not support Thai directly
-            # Add other mappings as needed
-        }
+        self.lang_classifier = PaddleClas(model_name="language_classification")  # Initialize PaddleClas
 
     async def _load(self, device: str):
         self.device = device
@@ -87,7 +66,9 @@ class ModelPaddleOCR(OfflineOCR):
             try:
                 # Use PaddleOCR for OCR
                 result = self.ocr.ocr(merged_region_imgs[idx], cls=True)
-                detected_lang = 'en'  # PaddleOCR does not support language detection
+                # Use PaddleClas for language detection
+                lang_result = next(self.lang_classifier.predict(input_data=merged_region_imgs[idx]))
+                detected_lang = lang_result['class_name']
                 if self.logger:
                     self.logger.info(f"Detected language: {detected_lang}")
                     self.logger.info(f"OCR result: {result}")  # Log the OCR result
