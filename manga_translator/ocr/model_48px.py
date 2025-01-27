@@ -159,7 +159,9 @@ class Model48pxOCR(OfflineOCR):
                 out_regions.append(cur_region)
 
         if is_quadrilaterals:
+            print('out_regions:', out_regions)
             return out_regions
+        print('textlines:', textlines)
         return textlines
 
 class ConvNeXtBlock(nn.Module):
