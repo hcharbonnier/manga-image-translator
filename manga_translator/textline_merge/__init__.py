@@ -109,20 +109,20 @@ def split_text_region(
 
 def merge_bboxes_text_region(bboxes: List[Quadrilateral], width, height):
     # step 0: merge quadrilaterals that belong to the same textline
-    u = 0
-    removed_counter = 0
-    while u < len(bboxes) - 1 - removed_counter:
-        v = u
-        while v < len(bboxes) - removed_counter:
-            if quadrilateral_can_merge_region(bboxes[u], bboxes[v], aspect_ratio_tol=1.1, font_size_ratio_tol=1,
-                                            char_gap_tolerance=1, char_gap_tolerance2=3, discard_connection_gap=0) \
-               and abs(bboxes[u].centroid[0] - bboxes[v].centroid[0]) < 5 or abs(bboxes[u].centroid[1] - bboxes[v].centroid[1]) < 5:
-                    bboxes[u] = merge_quadrilaterals(bboxes[u], bboxes[v])
-                    removed_counter += 1
-                    bboxes.pop(v)
-            else:
-                v += 1
-        u += 1
+    # u = 0
+    # removed_counter = 0
+    # while u < len(bboxes) - 1 - removed_counter:
+    #     v = u
+    #     while v < len(bboxes) - removed_counter:
+    #         if quadrilateral_can_merge_region(bboxes[u], bboxes[v], aspect_ratio_tol=1.1, font_size_ratio_tol=1,
+    #                                         char_gap_tolerance=1, char_gap_tolerance2=3, discard_connection_gap=0) \
+    #            and abs(bboxes[u].centroid[0] - bboxes[v].centroid[0]) < 5 or abs(bboxes[u].centroid[1] - bboxes[v].centroid[1]) < 5:
+    #                 bboxes[u] = merge_quadrilaterals(bboxes[u], bboxes[v])
+    #                 removed_counter += 1
+    #                 bboxes.pop(v)
+    #         else:
+    #             v += 1
+    #     u += 1
 
     # step 1: divide into multiple text region candidates
     G = nx.Graph()
