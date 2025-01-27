@@ -51,29 +51,33 @@ class ModelPaddleOCR(OfflineOCR):
         
         # Generate Text Direction
         for textline in textlines:
-            # Determine the direction of the text region
             direction = "horizontal"  # Placeholder for actual direction determination logic
+            # Determine the direction of the text region
+            if textline.width() > textline.height():
+                direction = "horizontal"
+            else:
+                direction = "vertical"
             # ...existing code...
 
         # Transform Regions
         transformed_regions = []
         for textline in textlines:
-            # Transform each text region to a standard size
             transformed_region = textline  # Placeholder for actual transformation logic
+            # Transform each text region to a standard size
+            transformed_region = textline.get_transformed_region(image, direction, config.text_height)
             transformed_regions.append(transformed_region)
             # ...existing code...
 
         # Recognize Text
         for region in transformed_regions:
             # Use PaddleClas to detect language
-            lang_result = self.lang_classifier.predict(region)
+            lang_result = list(self.lang_classifier.predict(region))
             detected_lang = lang_result[0]['label']
             
             # Use PaddleOCR to recognize text
             ocr_result = self.ocr.ocr(region, cls=False)
             for line in ocr_result:
                 text, prob = line[1][0], line[1][1]
-                # Log the recognized text and its attributes
                 if verbose:
                     print(f"Recognized text: {text} with probability: {prob}")
                 
