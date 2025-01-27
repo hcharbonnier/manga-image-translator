@@ -33,22 +33,41 @@ class ModelPaddleOCR(OfflineOCR):
     async def _load(self, device: str):
         self.device = device
         self.use_gpu = device in ['cuda', 'mps']
+        
+        # Load the OCR model and its dictionary
+        self.ocr = PaddleOCR(use_angle_cls=False, lang='en', det_model_dir=self.model_file, rec_model_dir=self.model_file, rec_char_dict_path=self.dict_file)
+        self.ocr.model.eval()
+        print("OCR model loaded and set to evaluation mode.")
+        
+        # Load the language classifier
+        self.lang_classifier = PaddleClas(model_name="language_classification")
+        self.lang_classifier.model.eval()
+        print("Language classifier loaded and set to evaluation mode.")
 
     async def _unload(self):
-        pass
-    
+        # Clean up by deleting the model and related objects from memory
+        del self.ocr
+        del self.lang_classifier
+        torch.cuda.empty_cache()
+        print("Models unloaded and memory cleaned up.")
+
     async def _infer(self, image: np.ndarray, textlines: List[Quadrilateral], config: OcrConfig, verbose: bool = False, ignore_bubble: int = 0) -> List[TextBlock]:
         text_height = 48
         max_chunk_size = 16
 
+        # Generate text direction
         quadrilaterals = list(self._generate_text_direction(textlines))
+        print(f"Generated text directions: {quadrilaterals}")
+        
         region_imgs = [q.get_transformed_region(image, d, text_height) for q, d in quadrilaterals]
+        print(f"Transformed text regions: {region_imgs}")
 
         perm = range(len(region_imgs))
         is_quadrilaterals = False
         if len(quadrilaterals) > 0 and isinstance(quadrilaterals[0][0], Quadrilateral):
             perm = sorted(range(len(region_imgs)), key=lambda x: region_imgs[x].shape[1])
             is_quadrilaterals = True
+        print(f"Permutation of regions: {perm}")
 
         texts = {}
         merged_idx = [[i] for i in range(len(region_imgs))]
@@ -62,14 +81,18 @@ class ModelPaddleOCR(OfflineOCR):
                 merged_text_height = q.aabb.h
                 merged_d = 'h'
             merged_region_imgs.append(q.get_transformed_region(image, merged_d, merged_text_height))
+        print(f"Merged region images: {merged_region_imgs}")
+
+        # Recognize text
         for idx in range(len(merged_region_imgs)):
             try:
                 # Use PaddleOCR for OCR
                 result = self.ocr.ocr(merged_region_imgs[idx], cls=True)
-                print(f"OCR result: {result}")
+                print(f"OCR result for region {idx}: {result}")
                 # Use PaddleClas for language detection
                 lang_result = next(self.lang_classifier.predict(input_data=merged_region_imgs[idx]))
                 detected_lang = lang_result['class_name']
+                print(f"Detected language for region {idx}: {detected_lang}")
                 if self.logger:
                     self.logger.info(f"Detected language: {detected_lang}")
                     self.logger.info(f"OCR result: {result}")  # Log the OCR result
@@ -77,8 +100,9 @@ class ModelPaddleOCR(OfflineOCR):
                     raise ValueError("Invalid OCR result format")
                 # Extract and concatenate the recognized text
                 texts[idx] = " ".join([line[1][0] for line in result if line and isinstance(line, list) and len(line) > 1])
-                print(f"Text: {texts[idx]}")
+                print(f"Recognized text for region {idx}: {texts[idx]}")
             except Exception as e:
+                print(f"Error during OCR for region {idx}: {e}")
                 if self.logger:
                     self.logger.error(f"Error during OCR: {e}")
                 texts[idx] = ""
@@ -108,6 +132,7 @@ class ModelPaddleOCR(OfflineOCR):
                 cur_region.text = texts[indices[i]]
                 cur_region.prob = 1.0  # Set a default probability
                 out_regions[idx_keys[i]] = cur_region
+        print(f"Output regions after processing: {out_regions}")
 
         output_regions = []
         for i, nodes in enumerate(merged_idx):
@@ -140,9 +165,9 @@ class ModelPaddleOCR(OfflineOCR):
             bb = round(np.mean(bg_b))
 
             txt = texts[nodes[0]]  # Ensure correct indexing
+            print(f'Final text and attributes for region {i}: prob: {prob}, text: {txt}, fg: ({fr}, {fg}, {fb}), bg: ({br}, {bg}, {bb})')
             if self.logger:
                 self.logger.info(f'prob: {prob} {txt} fg: ({fr}, {fg}, {fb}) bg: ({br}, {bg}, {bb})')
-            print(f'prob: {prob} {txt} fg: ({fr}, {fg}, {fb}) bg: ({br}, {bg}, {bb})')
             cur_region = merged_quadrilaterals[i][0]
             if isinstance(cur_region, Quadrilateral):
                 cur_region.text = txt
