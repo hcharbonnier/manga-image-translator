@@ -123,6 +123,8 @@ class ModelPaddleOCR(OfflineOCR):
             bg_b = []
 
             for idx in nodes:
+                print(f"idx: {idx}")
+                print(f"out_regions: {out_regions}")
                 if idx not in out_regions:
                     continue
 
