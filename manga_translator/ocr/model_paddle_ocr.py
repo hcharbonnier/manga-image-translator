@@ -27,6 +27,8 @@ class ModelPaddleOCR(OfflineOCR):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.logger = kwargs.get('logger', None)  # Ensure logger is defined
+        self.model_file = kwargs.get('model_file', None)  # Add model_file attribute
+        self.dict_file = kwargs.get('dict_file', None)  # Add dict_file attribute
         self.ocr = PaddleOCR(use_angle_cls=False, lang='en')  # Initialize PaddleOCR
         self.lang_classifier = PaddleClas(model_name="language_classification")  # Initialize PaddleClas
 
