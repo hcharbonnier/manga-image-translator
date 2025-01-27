@@ -64,11 +64,11 @@ class ModelPaddleOCR(OfflineOCR):
             merged_region_imgs.append(q.get_transformed_region(image, merged_d, merged_text_height))
         for idx in range(len(merged_region_imgs)):
             try:
-                # Use PaddleOCR for OCR
-                result = self.ocr.ocr(merged_region_imgs[idx], cls=True)
                 # Use PaddleClas for language detection
                 lang_result = next(self.lang_classifier.predict(input_data=merged_region_imgs[idx]))
                 detected_lang = lang_result['class_name']
+                # Use PaddleOCR for OCR with detected language
+                result = self.ocr.ocr(merged_region_imgs[idx], cls=True, lang=detected_lang)
                 if self.logger:
                     self.logger.info(f"Detected language: {detected_lang}")
                     self.logger.info(f"OCR result: {result}")  # Log the OCR result
