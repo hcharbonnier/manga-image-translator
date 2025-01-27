@@ -28,7 +28,7 @@ class ModelPaddleOCR(OfflineOCR):
         super().__init__(*args, **kwargs)
         self.logger = kwargs.get('logger', None)  # Ensure logger is defined
         self.ocr = PaddleOCR(use_angle_cls=False, lang='en')  # Initialize PaddleOCR
-        self.lang_classifier = None  # Initialize PaddleClas as None
+        self.lang_classifier = PaddleClas(model_name="language_classification")  # Initialize PaddleClas
 
     async def _load(self, device: str):
         self.device = device
@@ -62,18 +62,13 @@ class ModelPaddleOCR(OfflineOCR):
                 merged_text_height = q.aabb.h
                 merged_d = 'h'
             merged_region_imgs.append(q.get_transformed_region(image, merged_d, merged_text_height))
-
-        # Load PaddleClas model dynamically
-        if self.lang_classifier is None:
-            self.lang_classifier = PaddleClas(model_name="language_classification")
-
         for idx in range(len(merged_region_imgs)):
             try:
+                # Use PaddleOCR for OCR
+                result = self.ocr.ocr(merged_region_imgs[idx], cls=True)
                 # Use PaddleClas for language detection
                 lang_result = next(self.lang_classifier.predict(input_data=merged_region_imgs[idx]))
                 detected_lang = lang_result['class_name']
-                # Use PaddleOCR for OCR with detected language
-                result = self.ocr.ocr(merged_region_imgs[idx], cls=True, lang="en")
                 if self.logger:
                     self.logger.info(f"Detected language: {detected_lang}")
                     self.logger.info(f"OCR result: {result}")  # Log the OCR result
@@ -86,9 +81,6 @@ class ModelPaddleOCR(OfflineOCR):
                 if self.logger:
                     self.logger.error(f"Error during OCR: {e}")
                 texts[idx] = ""
-
-        # Unload PaddleClas model to free up memory
-        self.lang_classifier = None
 
         ix = 0
         out_regions = {}
