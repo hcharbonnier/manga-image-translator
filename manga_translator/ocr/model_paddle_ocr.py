@@ -96,7 +96,7 @@ class ModelPaddleOCR(OfflineOCR):
                 if not result or not isinstance(result, list):
                     raise ValueError("Invalid OCR result format")
                 # Extract and concatenate the recognized text
-                texts[idx] = " ".join([line[1][0] for line in result if line and isinstance(line, list) and len(line) > 1])
+                texts[idx] = " ".join([line[1][0] for line in result[0] if line and isinstance(line, list) and len(line) > 1])
                 print(f"Recognized text for region {idx}: {texts[idx]}")
             except Exception as e:
                 print(f"Error during OCR for region {idx}: {e}")
