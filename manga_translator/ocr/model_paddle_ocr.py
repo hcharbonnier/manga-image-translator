@@ -71,8 +71,11 @@ class ModelPaddleOCR(OfflineOCR):
 
         # Recognize Text
         for region in transformed_regions:
+            # Convert region to a valid image type for PaddleClas
+            region_image = Image.fromarray(region) if isinstance(region, np.ndarray) else region
+            
             # Use PaddleClas to detect language
-            lang_result = list(self.lang_classifier.predict(region))
+            lang_result = list(self.lang_classifier.predict(region_image))
             detected_lang = lang_result[0]['label']
             
             # Use PaddleOCR to recognize text
