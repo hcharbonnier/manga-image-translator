@@ -27,8 +27,6 @@ class ModelPaddleOCR(OfflineOCR):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.logger = kwargs.get('logger', None)  # Ensure logger is defined
-        self.ocr = PaddleOCR(use_angle_cls=False, lang='en')  # Initialize PaddleOCR
-        self.lang_classifier = PaddleClas(model_name="language_classification")  # Initialize PaddleClas
 
     async def _load(self, device: str):
         self.device = device
@@ -99,7 +97,6 @@ class ModelPaddleOCR(OfflineOCR):
             except Exception as e:
                 print(f"Error during OCR for region {idx}: {e}")
                 print(f"Region merged_region_imgs[idx]: {merged_region_imgs[idx]}")
-                print(f"line: {line}")
                 if self.logger:
                     self.logger.error(f"Error during OCR: {e}")
                 texts[idx] = ""
