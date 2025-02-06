@@ -48,6 +48,8 @@ class PaddleDetector(OfflineDetector, ModelWrapper):
         else:
             self.use_gpu = False
         global MODEL
+        EP_list = ['CUDAExecutionProvider', 'CPUExecutionProvider']
+        
         MODEL = RapidOCR(
             det_model_path=self.model_dir+'/onnx/ch_PP-OCRv4_det_server_infer/ch_PP-OCRv4_det_server_infer.onnx',
             det_use_cuda=self.use_gpu,

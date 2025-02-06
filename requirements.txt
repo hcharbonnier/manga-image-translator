@@ -56,3 +56,4 @@ pydantic
 python-multipart
 paddleocr_convert
 rapidocr_onnxruntime
+onnxruntime-gpu==1.18.1
