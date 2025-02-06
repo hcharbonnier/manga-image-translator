@@ -10,12 +10,12 @@ from .common import CommonDetector, OfflineDetector
 from ..config import Detector
 
 DETECTORS = {
-    Detector.default: DefaultDetector,
-    Detector.dbconvnext: DBConvNextDetector,
-    Detector.ctd: ComicTextDetector,
-    Detector.craft: CRAFTDetector,
+    # Detector.default: DefaultDetector,
+    # Detector.dbconvnext: DBConvNextDetector,
+    # Detector.ctd: ComicTextDetector,
+    # Detector.craft: CRAFTDetector,
     Detector.paddle: PaddleDetector,
-    Detector.none: NoneDetector,
+    # Detector.none: NoneDetector,
 }
 detector_cache = {}
 

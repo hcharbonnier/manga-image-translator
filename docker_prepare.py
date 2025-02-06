@@ -22,6 +22,7 @@ async def download(dict):
             try:
                 inst = value()
                 await inst.download()
+                await inst.convert()
             except Exception as e:
                 print("Failed to download", key, value)
                 print(e)
@@ -39,16 +40,16 @@ async def main():
             if (not models) or (f"detector.{k}" in models)
         }
     )
-    await download(
-        {k: v for k, v in OCRS.items() if (not models) or (f"ocr.{k}" in models)}
-    )
-    await download(
-        {
-            k: v
-            for k, v in INPAINTERS.items()
-            if (not models) or (f"inpaint.{k}" in models) and (k not in ["sd"])
-        }
-    )
+    # await download(
+    #     {k: v for k, v in OCRS.items() if (not models) or (f"ocr.{k}" in models)}
+    # )
+    # await download(
+    #     {
+    #         k: v
+    #         for k, v in INPAINTERS.items()
+    #         if (not models) or (f"inpaint.{k}" in models) and (k not in ["sd"])
+    #     }
+    # )
 
 
 if __name__ == "__main__":
