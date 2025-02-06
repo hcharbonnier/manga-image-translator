@@ -8,8 +8,8 @@ WORKDIR /app
 
 COPY requirements.txt /app/requirements.txt
 
-RUN export TZ=Etc/UTC \
-        apt update --yes \
+RUN export TZ=Etc/UTC ; \
+        && apt update --yes \
         && apt install g++ ffmpeg libsm6 libxext6 gimp --yes \
         && pip install -r /app/requirements.txt \
         && apt remove g++ --yes \

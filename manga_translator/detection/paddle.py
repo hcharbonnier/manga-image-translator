@@ -2,7 +2,6 @@ import os
 import shutil
 import numpy as np
 import cv2
-from paddleocr import PaddleOCR
 from typing import List, Tuple
 from paddleocr_convert import PaddleOCRModelConvert
 from rapidocr_onnxruntime import RapidOCR
