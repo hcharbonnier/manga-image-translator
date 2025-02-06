@@ -8,7 +8,7 @@ WORKDIR /app
 
 COPY requirements.txt /app/requirements.txt
 
-RUN export TZ=Etc/UTC ; \
+RUN export TZ=Etc/UTC \
         && apt update --yes \
         && apt install g++ ffmpeg libsm6 libxext6 gimp --yes \
         && pip install -r /app/requirements.txt \
@@ -19,7 +19,7 @@ RUN export TZ=Etc/UTC ; \
 COPY . /app
 
 # Prepare models
-RUN python -u docker_prepare.py --continue-on-error
+#RUN python -u docker_prepare.py --continue-on-error
 
 RUN rm -rf /tmp && mkdir /tmp && chmod 1777 /tmp
 
