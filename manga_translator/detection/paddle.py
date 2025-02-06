@@ -28,7 +28,7 @@ class PaddleDetector(OfflineDetector, ModelWrapper):
         converter = PaddleOCRModelConvert()
         model_path = self.model_dir + '/ch_PP-OCRv4_det_server_infer.tar'
         save_dir =  self.model_dir + '/onnx/'
-        if not os.path.exists(self.model_dir+'/onnx/ch_PP-OCRv4_det_server_infer/ch_PP-OCRv4_det_server_infer.onnx')
+        if not os.path.exists(self.model_dir+'/onnx/ch_PP-OCRv4_det_server_infer/ch_PP-OCRv4_det_server_infer.onnx'):
             converter(model_path, save_dir)
 
     async def _load(self, device: str, text_threshold: float, box_threshold: float, unclip_ratio: float, invert: bool = False, verbose: bool = False):
